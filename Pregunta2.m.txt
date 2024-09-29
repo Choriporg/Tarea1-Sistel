@@ -1,0 +1,28 @@
+j = 1i;  % Unidad imaginaria
+
+% Funcion de la transformada de Fourier
+X_f = (1 ./ (1 + j * 2 * pi * f).^2) .* (1 - exp(-2 - j * 4 * pi * f));
+
+f = linspace(-10, 10, length(X_f));  % Valores de frecuencia
+
+% Cálculo de la magnitud y la fase
+magnitud = abs(X_f);
+fase = angle(X_f);
+
+% Graficar la magnitud
+figure;
+subplot(2,1,1);
+plot(f, magnitud, 'LineWidth', 1);
+title('Magnitud de X(f)');
+xlabel('Frecuencia (Hz)');
+ylabel('Magnitud');
+grid on;
+
+% Graficar la fase
+subplot(2,1,2);
+plot(f, fase, 'LineWidth', 1);
+title('Fase de X(f)');
+xlabel('Frecuencia (Hz)');
+ylabel('Fase (radianes)');
+grid on;
+

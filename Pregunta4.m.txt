@@ -1,0 +1,68 @@
+%Cargamos el archivo de audio 
+[y, Fs] = audioread('guitarra.wav');
+
+%Creamos el vector de tiempo
+t = (0:length(y)-1)/Fs * 1000;
+
+% Crear un buffer para la señal de salida
+new_signal = zeros(size(y));
+
+%Convertir el audio a muestras
+ylen = length(y);
+T = ylen/Fs;
+
+% Parámetros del efecto de reverb
+delay = 100/1000;  % Retardo en segundos
+feedback = 0.8;  % Retroalimentación (80%)
+
+%Convertir el delay a muestras
+delay_samples = round(delay * Fs);
+
+% Aplicamos reverb utilizando retardo y retroalimentación
+for i = (delay_samples+1):ylen  % Comenzar después del retardo
+    % Señal original + retroalimentación de la versión retardada
+    new_signal(i) = y(i) + feedback * new_signal(i - delay_samples);
+end
+
+% Visualización en el dominio temporal
+figure;
+subplot(2,1,1);
+plot(t, y);
+title('Señal Original en el Dominio Temporal');
+xlabel('Tiempo (ms)');
+ylabel('Amplitud');
+
+subplot(2,1,2);
+plot(t, new_signal);
+title('Señal con Reverb en el Dominio Temporal');
+xlabel('Tiempo (ms)');
+ylabel('Amplitud');
+
+% Transformada de Fourier para obtener el espectro de frecuencia
+Y = fft(y);
+New_Signal_FFT = fft(new_signal);
+
+% Generar el eje de frecuencias
+f = (0:length(Y)-1)*Fs/length(Y);
+
+% Visualización en el dominio de la frecuencia
+figure;
+subplot(2,1,1);
+plot(f(1:round(length(f)/2)), abs(Y(1:round(length(f)/2))));
+title('Espectro de Frecuencia de la Señal Original');
+xlabel('Frecuencia (Hz)');
+ylabel('Magnitud');
+
+subplot(2,1,2);
+plot(f(1:round(length(f)/2)), abs(New_Signal_FFT(1:round(length(f)/2))));
+title('Espectro de Frecuencia de la Señal con Reverb');
+xlabel('Frecuencia (Hz)');
+ylabel('Magnitud');
+
+% Reproducir las señales
+sound(y, Fs); % Señal original
+pause(T); % Pausar para esperar que termine
+sound(new_signal, Fs); % Señal con reverb
+
+% Guardar la señal con reverb
+audiowrite('guitarra_con_reverb.wav', new_signal, Fs); % Guardar el audio con efecto
